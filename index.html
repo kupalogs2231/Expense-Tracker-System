@@ -705,6 +705,49 @@
     </div>
 
     <script>
+        // Storage wrapper that uses localStorage as fallback
+        const storage = {
+            async get(key) {
+                // Try window.storage first
+                if (window.storage) {
+                    try {
+                        return await window.storage.get(key);
+                    } catch (e) {
+                        return null;
+                    }
+                }
+                // Fallback to localStorage
+                const value = localStorage.getItem(key);
+                return value ? { key, value } : null;
+            },
+            async set(key, value) {
+                // Try window.storage first
+                if (window.storage) {
+                    try {
+                        return await window.storage.set(key, value);
+                    } catch (e) {
+                        return null;
+                    }
+                }
+                // Fallback to localStorage
+                localStorage.setItem(key, value);
+                return { key, value };
+            },
+            async delete(key) {
+                // Try window.storage first
+                if (window.storage) {
+                    try {
+                        return await window.storage.delete(key);
+                    } catch (e) {
+                        return null;
+                    }
+                }
+                // Fallback to localStorage
+                localStorage.removeItem(key);
+                return { key, deleted: true };
+            }
+        };
+
         let currentUser = null;
         let transactions = [];
         let editingId = null;
