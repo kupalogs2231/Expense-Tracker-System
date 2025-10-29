@@ -1,1100 +1,298 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expense Tracker - Financial Management System</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-            background: #f5f7fa;
-            min-height: 100vh;
-            color: #1e293b;
-        }
-
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 260px;
-            height: 100vh;
-            background: #1e293b;
-            color: white;
-            padding: 30px 20px;
-            z-index: 1000;
-        }
-
-        .logo {
-            font-size: 1.4em;
-            font-weight: 700;
-            margin-bottom: 40px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            letter-spacing: -0.5px;
-        }
-
-        .user-profile {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-        }
-
-        .user-profile-name {
-            font-weight: 600;
-            margin-bottom: 5px;
-            font-size: 0.95em;
-        }
-
-        .user-profile-role {
-            font-size: 0.85em;
-            color: #94a3b8;
-        }
-
-        .nav-menu {
-            list-style: none;
-        }
-
-        .nav-item {
-            padding: 12px 15px;
-            margin-bottom: 5px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.2s;
-            font-size: 0.95em;
-        }
-
-        .nav-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .nav-item.active {
-            background: #3b82f6;
-        }
-
-        .btn-logout-sidebar {
-            margin-top: auto;
-            padding: 12px 15px;
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-            border: 1px solid #ef4444;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            width: 100%;
-            transition: all 0.2s;
-            font-size: 0.95em;
-        }
-
-        .btn-logout-sidebar:hover {
-            background: #ef4444;
-            color: white;
-        }
-
-        .main-content {
-            margin-left: 260px;
-            padding: 30px 40px;
-        }
-
-        .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 35px;
-        }
-
-        .topbar h1 {
-            font-size: 1.8em;
-            font-weight: 700;
-            color: #0f172a;
-        }
-
-        .topbar-subtitle {
-            color: #64748b;
-            font-size: 0.9em;
-            margin-top: 5px;
-        }
-
-        .topbar-actions {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-
-        .current-date {
-            color: #64748b;
-            font-size: 0.9em;
-        }
-
-        .auth-container {
-            max-width: 480px;
-            margin: 80px auto;
-            background: white;
-            border-radius: 12px;
-            padding: 50px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-        }
-
-        .auth-header {
-            text-align: center;
-            margin-bottom: 35px;
-        }
-
-        .auth-header h1 {
-            font-size: 1.8em;
-            color: #0f172a;
-            margin-bottom: 8px;
-            font-weight: 700;
-        }
-
-        .auth-header p {
-            color: #64748b;
-            font-size: 0.95em;
-        }
-
-        .summary-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 35px;
-        }
-
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e2e8f0;
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .card h3 {
-            color: #64748b;
-            font-size: 0.85em;
-            text-transform: uppercase;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        .card .amount {
-            font-size: 2em;
-            font-weight: 700;
-            color: #0f172a;
-        }
-
-        .card.income .amount {
-            color: #16a34a;
-        }
-
-        .card.expense .amount {
-            color: #dc2626;
-        }
-
-        .card.balance .amount {
-            color: #2563eb;
-        }
-
-        .content-grid {
-            display: grid;
-            grid-template-columns: 400px 1fr;
-            gap: 25px;
-            margin-bottom: 25px;
-        }
-
-        .section-card {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e2e8f0;
-        }
-
-        .section-card h2 {
-            font-size: 1.3em;
-            margin-bottom: 25px;
-            color: #0f172a;
-            font-weight: 700;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #475569;
-            font-weight: 500;
-            font-size: 0.9em;
-        }
-
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: 0.95em;
-            transition: all 0.2s;
-            background: white;
-            color: #0f172a;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 12px;
-            margin-top: 25px;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 13px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.95em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-primary {
-            background: #3b82f6;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #2563eb;
-        }
-
-        .btn-secondary {
-            background: #f1f5f9;
-            color: #475569;
-            border: 1px solid #cbd5e1;
-        }
-
-        .btn-secondary:hover {
-            background: #e2e8f0;
-        }
-
-        .btn-full {
-            width: 100%;
-        }
-
-        .transactions-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-
-        .transactions-header h2 {
-            font-size: 1.3em;
-            color: #0f172a;
-            font-weight: 700;
-        }
-
-        .filter-group {
-            display: flex;
-            gap: 12px;
-        }
-
-        .filter-group select {
-            padding: 10px 15px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.9em;
-            background: white;
-        }
-
-        .transaction-list {
-            max-height: 550px;
-            overflow-y: auto;
-        }
-
-        .transaction-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 18px 20px;
-            border-bottom: 1px solid #f1f5f9;
-            transition: background-color 0.2s;
-        }
-
-        .transaction-item:hover {
-            background-color: #f8fafc;
-        }
-
-        .transaction-item:last-child {
-            border-bottom: none;
-        }
-
-        .transaction-info {
-            flex: 1;
-        }
-
-        .transaction-description {
-            font-weight: 600;
-            color: #0f172a;
-            margin-bottom: 6px;
-            font-size: 0.95em;
-        }
-
-        .transaction-meta {
-            display: flex;
-            gap: 15px;
-            font-size: 0.85em;
-            color: #64748b;
-        }
-
-        .transaction-amount {
-            font-size: 1.1em;
-            font-weight: 700;
-            margin-right: 20px;
-        }
-
-        .transaction-amount.income {
-            color: #16a34a;
-        }
-
-        .transaction-amount.expense {
-            color: #dc2626;
-        }
-
-        .transaction-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn-icon {
-            background: #f1f5f9;
-            border: none;
-            cursor: pointer;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 0.9em;
-            color: #475569;
-            transition: all 0.2s;
-        }
-
-        .btn-icon:hover {
-            background: #e2e8f0;
-        }
-
-        .btn-icon.delete:hover {
-            background: #fee2e2;
-            color: #dc2626;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #94a3b8;
-        }
-
-        .category-badge {
-            display: inline-block;
-            padding: 5px 12px;
-            background: #f1f5f9;
-            border-radius: 6px;
-            font-size: 0.85em;
-            font-weight: 500;
-            color: #475569;
-        }
-
-        .auth-toggle {
-            text-align: center;
-            margin-top: 25px;
-            color: #64748b;
-            font-size: 0.95em;
-        }
-
-        .auth-toggle a {
-            color: #3b82f6;
-            text-decoration: none;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .auth-toggle a:hover {
-            text-decoration: underline;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .error-message {
-            background: #fee2e2;
-            color: #dc2626;
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 0.9em;
-            border: 1px solid #fecaca;
-        }
-
-        .success-message {
-            background: #dcfce7;
-            color: #16a34a;
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 0.9em;
-            border: 1px solid #bbf7d0;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 100px 20px;
-            color: #64748b;
-            font-size: 1.2em;
-        }
-
-        @media (max-width: 1200px) {
-            .content-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 968px) {
-            .sidebar {
-                display: none;
-            }
-
-            .main-content {
-                margin-left: 0;
-                padding: 20px;
-            }
-
-            .topbar {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-
-            .summary-cards {
-                grid-template-columns: 1fr;
-            }
-
-            .auth-container {
-                margin: 40px 20px;
-                padding: 35px 25px;
-            }
-        }
-
-        @media (max-width: 640px) {
-            .transactions-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-
-            .filter-group {
-                width: 100%;
-            }
-
-            .filter-group select {
-                flex: 1;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Expense Tracker</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f6f8fa;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      max-width: 450px;
+      width: 100%;
+      padding: 30px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #007bff;
+      margin-bottom: 20px;
+    }
+
+    form {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .transactions {
+      margin-top: 20px;
+    }
+
+    .transaction {
+      background: #f1f1f1;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .transaction.expense {
+      border-left: 5px solid #e74c3c;
+    }
+
+    .transaction.income {
+      border-left: 5px solid #2ecc71;
+    }
+
+    .balance {
+      font-size: 1.2em;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .auth-container {
+      text-align: center;
+    }
+
+    .logout-btn {
+      background-color: #dc3545;
+    }
+
+    .logout-btn:hover {
+      background-color: #b52b3b;
+    }
+
+    .small {
+      font-size: 0.9em;
+      color: #007bff;
+      cursor: pointer;
+    }
+
+    .small:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
-    <!-- Loading State -->
-    <div id="loadingScreen" class="loading">
-        <p>Loading application...</p>
+  <div class="container">
+    <h1>Expense Tracker</h1>
+
+    <!-- Login/Register Form -->
+    <div id="auth-section" class="auth-container">
+      <div id="login-form">
+        <h3>Login</h3>
+        <input type="text" id="login-username" placeholder="Username" />
+        <input type="password" id="login-password" placeholder="Password" />
+        <button id="login-btn">Login</button>
+        <p>Don't have an account? <span id="show-register" class="small">Register here</span></p>
+      </div>
+
+      <div id="register-form" style="display:none;">
+        <h3>Register</h3>
+        <input type="text" id="register-username" placeholder="Username" />
+        <input type="password" id="register-password" placeholder="Password" />
+        <button id="register-btn">Register</button>
+        <p>Already have an account? <span id="show-login" class="small">Login here</span></p>
+      </div>
     </div>
 
-    <!-- Login Form -->
-    <div id="loginForm" class="auth-container hidden">
-        <div class="auth-header">
-            <h1>Financial Management</h1>
-            <p>Sign in to access your account</p>
-        </div>
-        <div id="loginError"></div>
-        <form onsubmit="handleLogin(event)">
-            <div class="form-group">
-                <label for="loginUsername">Username</label>
-                <input type="text" id="loginUsername" placeholder="Enter your username" required>
-            </div>
-            <div class="form-group">
-                <label for="loginPassword">Password</label>
-                <input type="password" id="loginPassword" placeholder="Enter your password" required>
-            </div>
-            <button type="submit" class="btn btn-primary btn-full">Sign In</button>
-        </form>
-        <div class="auth-toggle">
-            Don't have an account? <a onclick="showRegister()">Create Account</a>
-        </div>
+    <!-- Main Tracker Section -->
+    <div id="tracker-section" style="display:none;">
+      <div class="balance" id="balance">Balance: ₱0.00</div>
+
+      <form id="transaction-form">
+        <label for="type">Type</label>
+        <select id="type">
+          <option value="income">Income</option>
+          <option value="expense">Expense</option>
+        </select>
+
+        <label for="description">Description</label>
+        <input type="text" id="description" placeholder="e.g., Groceries, Salary" required />
+
+        <label for="amount">Amount</label>
+        <input type="number" id="amount" placeholder="Enter amount" required />
+
+        <button type="submit">Add Transaction</button>
+      </form>
+
+      <div class="transactions" id="transactions"></div>
+
+      <button class="logout-btn" id="logout-btn">Logout</button>
     </div>
+  </div>
 
-    <!-- Register Form -->
-    <div id="registerForm" class="auth-container hidden">
-        <div class="auth-header">
-            <h1>Create Account</h1>
-            <p>Register to start managing your finances</p>
-        </div>
-        <div id="registerError"></div>
-        <form onsubmit="handleRegister(event)">
-            <div class="form-group">
-                <label for="registerUsername">Username</label>
-                <input type="text" id="registerUsername" placeholder="Choose a username" required minlength="3">
-            </div>
-            <div class="form-group">
-                <label for="registerPassword">Password</label>
-                <input type="password" id="registerPassword" placeholder="Choose a password" required minlength="4">
-            </div>
-            <div class="form-group">
-                <label for="registerConfirmPassword">Confirm Password</label>
-                <input type="password" id="registerConfirmPassword" placeholder="Confirm your password" required>
-            </div>
-            <button type="submit" class="btn btn-primary btn-full">Create Account</button>
-        </form>
-        <div class="auth-toggle">
-            Already have an account? <a onclick="showLogin()">Sign In</a>
-        </div>
-    </div>
+  <script>
+    // ✅ Local Storage Wrapper
+    const storage = {
+      async get(key) {
+        const value = localStorage.getItem(key);
+        return value ? { key, value } : null;
+      },
+      async set(key, value) {
+        localStorage.setItem(key, value);
+        return { key, value };
+      },
+      async delete(key) {
+        localStorage.removeItem(key);
+        return { key, deleted: true };
+      }
+    };
 
-    <!-- Sidebar -->
-    <div id="sidebar" class="sidebar hidden">
-        <div class="logo">
-            FinanceTracker
-        </div>
-        <div class="user-profile">
-            <div class="user-profile-name" id="sidebarUsername"></div>
-            <div class="user-profile-role">Account Manager</div>
-        </div>
-        <ul class="nav-menu">
-            <li class="nav-item active">Dashboard</li>
-            <li class="nav-item">Transactions</li>
-            <li class="nav-item">Reports</li>
-            <li class="nav-item">Settings</li>
-        </ul>
-        <button class="btn-logout-sidebar" onclick="handleLogout()">Sign Out</button>
-    </div>
+    // DOM elements
+    const authSection = document.getElementById('auth-section');
+    const trackerSection = document.getElementById('tracker-section');
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const loginBtn = document.getElementById('login-btn');
+    const registerBtn = document.getElementById('register-btn');
+    const showRegister = document.getElementById('show-register');
+    const showLogin = document.getElementById('show-login');
+    const transactionForm = document.getElementById('transaction-form');
+    const transactionsDiv = document.getElementById('transactions');
+    const balanceDiv = document.getElementById('balance');
+    const logoutBtn = document.getElementById('logout-btn');
 
-    <!-- Main App -->
-    <div id="mainApp" class="main-content hidden">
-        <div class="topbar">
-            <div>
-                <h1>Financial Dashboard</h1>
-                <div class="topbar-subtitle">Manage and track your expenses efficiently</div>
-            </div>
-            <div class="topbar-actions">
-                <div class="current-date" id="currentDate"></div>
-            </div>
-        </div>
+    let currentUser = null;
+    let transactions = [];
 
-        <div class="summary-cards">
-            <div class="card balance">
-                <div class="card-header">
-                    <h3>Current Balance</h3>
-                </div>
-                <div class="amount" id="totalBalance">₱0.00</div>
-            </div>
-            <div class="card income">
-                <div class="card-header">
-                    <h3>Total Income</h3>
-                </div>
-                <div class="amount" id="totalIncome">₱0.00</div>
-            </div>
-            <div class="card expense">
-                <div class="card-header">
-                    <h3>Total Expenses</h3>
-                </div>
-                <div class="amount" id="totalExpense">₱0.00</div>
-            </div>
-        </div>
+    // Toggle forms
+    showRegister.addEventListener('click', () => {
+      loginForm.style.display = 'none';
+      registerForm.style.display = 'block';
+    });
+    showLogin.addEventListener('click', () => {
+      registerForm.style.display = 'none';
+      loginForm.style.display = 'block';
+    });
 
-        <div class="content-grid">
-            <div class="section-card">
-                <h2>New Transaction</h2>
-                <form id="transactionForm">
-                    <div class="form-group">
-                        <label for="description">Description</label>
-                        <input type="text" id="description" placeholder="e.g., Office supplies" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="amount">Amount (₱)</label>
-                        <input type="number" id="amount" placeholder="0.00" step="0.01" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="type">Transaction Type</label>
-                        <select id="type" required>
-                            <option value="expense">Expense</option>
-                            <option value="income">Income</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="category">Category</label>
-                        <select id="category" required>
-                            <option value="Food">Food & Dining</option>
-                            <option value="Transportation">Transportation</option>
-                            <option value="Entertainment">Entertainment</option>
-                            <option value="Shopping">Shopping</option>
-                            <option value="Bills">Bills & Utilities</option>
-                            <option value="Healthcare">Healthcare</option>
-                            <option value="Education">Education</option>
-                            <option value="Salary">Salary</option>
-                            <option value="Business">Business</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="date">Date</label>
-                        <input type="date" id="date" required>
-                    </div>
-                    <div class="btn-group">
-                        <button type="submit" class="btn btn-primary">Add Transaction</button>
-                        <button type="button" class="btn btn-secondary" onclick="clearForm()">Clear</button>
-                    </div>
-                </form>
-            </div>
+    // Register
+    registerBtn.addEventListener('click', async () => {
+      const username = document.getElementById('register-username').value.trim();
+      const password = document.getElementById('register-password').value.trim();
 
-            <div class="section-card">
-                <div class="transactions-header">
-                    <h2>Transaction History</h2>
-                    <div class="filter-group">
-                        <select id="filterType" onchange="filterTransactions()">
-                            <option value="all">All Types</option>
-                            <option value="income">Income</option>
-                            <option value="expense">Expense</option>
-                        </select>
-                        <select id="filterCategory" onchange="filterTransactions()">
-                            <option value="all">All Categories</option>
-                            <option value="Food">Food & Dining</option>
-                            <option value="Transportation">Transportation</option>
-                            <option value="Entertainment">Entertainment</option>
-                            <option value="Shopping">Shopping</option>
-                            <option value="Bills">Bills & Utilities</option>
-                            <option value="Healthcare">Healthcare</option>
-                            <option value="Education">Education</option>
-                            <option value="Salary">Salary</option>
-                            <option value="Business">Business</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="transaction-list" id="transactionList">
-                    <div class="empty-state">
-                        <p>No transactions recorded yet</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+      if (!username || !password) return alert('Please fill all fields.');
 
-    <script>
-        // Storage wrapper that uses localStorage as fallback
-        const storage = {
-            async get(key) {
-                // Try window.storage first
-                if (window.storage) {
-                    try {
-                        return await window.storage.get(key);
-                    } catch (e) {
-                        return null;
-                    }
-                }
-                // Fallback to localStorage
-                const value = localStorage.getItem(key);
-                return value ? { key, value } : null;
-            },
-            async set(key, value) {
-                // Try window.storage first
-                if (window.storage) {
-                    try {
-                        return await window.storage.set(key, value);
-                    } catch (e) {
-                        return null;
-                    }
-                }
-                // Fallback to localStorage
-                localStorage.setItem(key, value);
-                return { key, value };
-            },
-            async delete(key) {
-                // Try window.storage first
-                if (window.storage) {
-                    try {
-                        return await window.storage.delete(key);
-                    } catch (e) {
-                        return null;
-                    }
-                }
-                // Fallback to localStorage
-                localStorage.removeItem(key);
-                return { key, deleted: true };
-            }
-        };
+      const exists = await storage.get(`user_${username}`);
+      if (exists) return alert('Username already exists.');
 
-        let currentUser = null;
-        let transactions = [];
-        let editingId = null;
+      await storage.set(`user_${username}`, JSON.stringify({ password, transactions: [] }));
+      alert('Registration successful! Please log in.');
+      showLogin.click();
+    });
 
-        window.addEventListener('load', async () => {
-            await checkAuthStatus();
-            updateCurrentDate();
-        });
+    // Login
+    loginBtn.addEventListener('click', async () => {
+      const username = document.getElementById('login-username').value.trim();
+      const password = document.getElementById('login-password').value.trim();
 
-        function updateCurrentDate() {
-            const dateElement = document.getElementById('currentDate');
-            if (dateElement) {
-                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                dateElement.textContent = new Date().toLocaleDateString('en-US', options);
-            }
-        }
+      const userData = await storage.get(`user_${username}`);
+      if (!userData) return alert('User not found.');
 
-        async function checkAuthStatus() {
-            try {
-                const result = await window.storage.get('currentUser');
-                if (result && result.value) {
-                    currentUser = result.value;
-                    await loadUserData();
-                    showMainApp();
-                } else {
-                    showLogin();
-                }
-            } catch (error) {
-                showLogin();
-            }
-            document.getElementById('loadingScreen').classList.add('hidden');
-        }
+      const user = JSON.parse(userData.value);
+      if (user.password !== password) return alert('Incorrect password.');
 
-        async function handleRegister(event) {
-            event.preventDefault();
-            
-            const username = document.getElementById('registerUsername').value.trim();
-            const password = document.getElementById('registerPassword').value;
-            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+      currentUser = username;
+      transactions = user.transactions || [];
 
-            const errorDiv = document.getElementById('registerError');
-            errorDiv.innerHTML = '';
+      authSection.style.display = 'none';
+      trackerSection.style.display = 'block';
+      updateUI();
+    });
 
-            if (password !== confirmPassword) {
-                errorDiv.innerHTML = '<div class="error-message">Passwords do not match</div>';
-                return;
-            }
+    // Add Transaction
+    transactionForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-            try {
-                // Check if storage is available
-                if (!window.storage) {
-                    errorDiv.innerHTML = '<div class="error-message">Storage not available. Please ensure you are viewing this in the Claude interface.</div>';
-                    return;
-                }
+      const type = document.getElementById('type').value;
+      const description = document.getElementById('description').value.trim();
+      const amount = parseFloat(document.getElementById('amount').value);
 
-                let userCheck;
-                try {
-                    userCheck = await window.storage.get(`user_${username}`);
-                } catch (e) {
-                    // User doesn't exist, which is fine for registration
-                    userCheck = null;
-                }
+      if (!description || isNaN(amount)) return alert('Please enter valid data.');
 
-                if (userCheck) {
-                    errorDiv.innerHTML = '<div class="error-message">Username already exists</div>';
-                    return;
-                }
+      const transaction = { type, description, amount };
+      transactions.push(transaction);
 
-                const userData = {
-                    username: username,
-                    password: password,
-                    createdAt: new Date().toISOString()
-                };
+      const userData = JSON.parse((await storage.get(`user_${currentUser}`)).value);
+      userData.transactions = transactions;
+      await storage.set(`user_${currentUser}`, JSON.stringify(userData));
 
-                const setResult1 = await window.storage.set(`user_${username}`, JSON.stringify(userData));
-                const setResult2 = await window.storage.set(`transactions_${username}`, JSON.stringify([]));
+      transactionForm.reset();
+      updateUI();
+    });
 
-                if (!setResult1 || !setResult2) {
-                    errorDiv.innerHTML = '<div class="error-message">Failed to save user data. Please try again.</div>';
-                    return;
-                }
+    // Logout
+    logoutBtn.addEventListener('click', async () => {
+      currentUser = null;
+      transactions = [];
+      authSection.style.display = 'block';
+      trackerSection.style.display = 'none';
+    });
 
-                errorDiv.innerHTML = '<div class="success-message">Account created successfully! Please sign in.</div>';
-                
-                setTimeout(() => {
-                    document.getElementById('registerForm').reset();
-                    showLogin();
-                }, 1500);
-            } catch (error) {
-                console.error('Registration error:', error);
-                errorDiv.innerHTML = '<div class="error-message">Registration failed: ' + error.message + '</div>';
-            }
-        }
+    // Update UI
+    function updateUI() {
+      transactionsDiv.innerHTML = '';
+      let balance = 0;
 
-        async function handleLogin(event) {
-            event.preventDefault();
-            
-            const username = document.getElementById('loginUsername').value.trim();
-            const password = document.getElementById('loginPassword').value;
+      transactions.forEach((t) => {
+        const div = document.createElement('div');
+        div.classList.add('transaction', t.type);
+        div.innerHTML = `
+          <span>${t.description}</span>
+          <span>${t.type === 'income' ? '+' : '-'}₱${t.amount.toFixed(2)}</span>
+        `;
+        transactionsDiv.appendChild(div);
 
-            const errorDiv = document.getElementById('loginError');
-            errorDiv.innerHTML = '';
+        balance += t.type === 'income' ? t.amount : -t.amount;
+      });
 
-            try {
-                // Check if storage is available
-                if (!window.storage) {
-                    errorDiv.innerHTML = '<div class="error-message">Storage not available. Please ensure you are viewing this in the Claude interface.</div>';
-                    return;
-                }
-
-                let result;
-                try {
-                    result = await window.storage.get(`user_${username}`);
-                } catch (e) {
-                    errorDiv.innerHTML = '<div class="error-message">Invalid username or password</div>';
-                    return;
-                }
-                
-                if (!result || !result.value) {
-                    errorDiv.innerHTML = '<div class="error-message">Invalid username or password</div>';
-                    return;
-                }
-
-                const userData = JSON.parse(result.value);
-
-                if (userData.password !== password) {
-                    errorDiv.innerHTML = '<div class="error-message">Invalid username or password</div>';
-                    return;
-                }
-
-                currentUser = username;
-                await window.storage.set('currentUser', username);
-                await loadUserData();
-                
-                document.getElementById('loginForm').reset();
-                showMainApp();
-            } catch (error) {
-                console.error('Login error:', error);
-                errorDiv.innerHTML = '<div class="error-message">Login failed: ' + error.message + '</div>';
-            }
-        }
-
-        async function handleLogout() {
-            if (confirm('Are you sure you want to sign out?')) {
-                try {
-                    await window.storage.delete('currentUser');
-                } catch (error) {
-                    console.error('Logout error:', error);
-                }
-                currentUser = null;
-                transactions = [];
-                showLogin();
-            }
-        }
-
-        async function loadUserData() {
-            try {
-                const result = await window.storage.get(`transactions_${currentUser}`);
-                if (result && result.value) {
-                    transactions = JSON.parse(result.value);
-                } else {
-                    transactions = [];
-                }
-                updateDisplay();
-            } catch (error) {
-                transactions = [];
-                updateDisplay();
-            }
-        }
-
-        async function saveUserData() {
-            if (currentUser) {
-                try {
-                    await window.storage.set(`transactions_${currentUser}`, JSON.stringify(transactions));
-                    updateDisplay();
-                } catch (error) {
-                    console.error('Save error:', error);
-                }
-            }
-        }
-
-        function showLogin() {
-            document.getElementById('loginForm').classList.remove('hidden');
-            document.getElementById('registerForm').classList.add('hidden');
-            document.getElementById('mainApp').classList.add('hidden');
-            document.getElementById('sidebar').classList.add('hidden');
-            document.getElementById('loginError').innerHTML = '';
-        }
-
-        function showRegister() {
-            document.getElementById('registerForm').classList.remove('hidden');
-            document.getElementById('loginForm').classList.add('hidden');
-            document.getElementById('mainApp').classList.add('hidden');
-            document.getElementById('sidebar').classList.add('hidden');
-            document.getElementById('registerError').innerHTML = '';
-        }
-
-        function showMainApp() {
-            document.getElementById('mainApp').classList.remove('hidden');
-            document.getElementById('sidebar').classList.remove('hidden');
-            document.getElementById('loginForm').classList.add('hidden');
-            document.getElementById('registerForm').classList.add('hidden');
-            document.getElementById('sidebarUsername').textContent = currentUser;
-            setDefaultDate();
-            updateCurrentDate();
-        }
-
-        function setDefaultDate() {
-            const dateInput = document.getElementById('date');
-            const today = new Date().toISOString().split('T')[0];
-            dateInput.value = today;
-        }
-
-        document.getElementById('transactionForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const description = document.getElementById('description').value;
-            const amount = parseFloat(document.getElementById('amount').value);
-            const type = document.getElementById('type').value;
-            const category = document.getElementById('category').value;
-            const date = document.getElementById('date').value;
-
-            if (editingId !== null) {
-                const index = transactions.findIndex(t => t.id === editingId);
-                transactions[index] = {
-                    ...transactions[index],
-                    description,
-                    amount,
-                    type,
-                    category,
-                    date
-                };
-                editingId = null;
-                document.querySelector('.btn-primary').textContent = 'Add Transaction';
-            } else {
-                const transaction = {
-                    id: Date.now(),
-                    description,
-                    amount,
-                    type,
-                    category,
-                    date
-                };
-                transactions.push(transaction);
-            }
-
-            await saveUserData();
-            clearForm();
-        });
-
-        function clearForm() {
-            document.getElementById('transactionForm').reset();
-            setDefaultDate();
-            editingId = null;
-            document.querySelector('.btn-primary').textContent = 'Add Transaction';
-        }
-
-        function editTransaction(id) {
-            const transaction = transactions.find(t => t.id === id);
-            if (transaction) {
-                document.getElementById('description').value = transaction.description;
-                document.getElementById('amount').value = transaction.amount;
-                document.getElementById('type').value = transaction.type;
-                document.getElementById('category').value = transaction.category;
-                document.getElementById('date').value = transaction.date;
-                editingId = id;
-                document.querySelector('.btn-primary').textContent = 'Update Transaction';
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-        }
-
-        async function deleteTransaction(id) {
-            if (confirm('Are you sure you want to delete this transaction?')) {
-                transactions = transactions.filter(t => t.id !== id);
-                await saveUserData();
-            }
-        }
-
-        function filterTransactions() {
-            updateDisplay();
-        }
-
-        function updateDisplay() {
-            const filterType = document.getElementById('filterType').value;
-            const filterCategory = document.getElementById('filterCategory').value;
-
-            let filteredTransactions = transactions;
-
-            if (filterType !== 'all') {
-                filteredTransactions = filteredTransactions.filter(t => t.type === filterType);
-            }
-
-            if (filterCategory !== 'all') {
-                filteredTransactions = filteredTransactions.filter(t => t.category === filterCategory);
-            }
-
-            const income = transactions
-                .filter(t => t.type === 'income')
-                .reduce((sum, t) => sum + t.amount, 0);
-            
-            const expense = transactions
-                .filter(t => t.type === 'expense')
-                .reduce((sum, t) => sum + t.amount, 0);
-            
-            const balance = income - expense;
-
-            document.getElementById('totalBalance').textContent = formatCurrency(balance);
-            document.getElementById('totalIncome').textContent = formatCurrency(income);
-            document.getElementById('totalExpense').textContent = formatCurrency(expense);
-
-            const listContainer = document.getElementById('transactionList');
-            
-            if (filteredTransactions.length === 0) {
-                listContainer.innerHTML = '<div class="empty-state"><p>No transactions found</p></div>';
-                return;
-            }
-
-            filteredTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-            listContainer.innerHTML = filteredTransactions.map(t => `
-                <div class="transaction-item">
-                    <div class="transaction-info">
-                        <div class="transaction-description">${t.description}</div>
-                        <div class="transaction-meta">
-                            <span class="category-badge">${t.category}</span>
-                            <span>${formatDate(t.date)}</span>
-                        </div>
-                    </div>
-                    <div class="transaction-amount ${t.type}">
-                        ${t.type === 'income' ? '+' : '-'}${formatCurrency(t.amount)}
-                    </div>
-                    <div class="transaction-actions">
-                        <button class="btn-icon" onclick="editTransaction(${t.id})" title="Edit">Edit</button>
-                        <button class="btn-icon delete" onclick="deleteTransaction(${t.id})" title="Delete">Delete</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function formatCurrency(amount) {
-            return '₱' + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '                window.scroll,');
-        }
-
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-        }
-    </script>
+      balanceDiv.textContent = `Balance: ₱${balance.toFixed(2)}`;
+    }
+  </script>
 </body>
 </html>
