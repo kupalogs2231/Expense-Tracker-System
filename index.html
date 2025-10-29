@@ -772,6 +772,9 @@
             const errorDiv = document.getElementById('loginError');
             errorDiv.innerHTML = '';
 
+            console.log('Attempting login for:', username);
+            console.log('Available users:', Object.keys(users));
+
             if (!users[username]) {
                 errorDiv.innerHTML = '<div class="error-message">Invalid username or password</div>';
                 return;
@@ -783,10 +786,11 @@
             }
 
             currentUser = username;
-            loadUserData();
+            transactions = users[username].transactions || [];
             
             document.getElementById('loginForm').reset();
             showMainApp();
+            updateDisplay();
         }
 
         function handleLogout() {
