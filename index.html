@@ -146,18 +146,6 @@
             margin-bottom: 35px;
         }
 
-        .auth-logo {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            border-radius: 12px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8em;
-            margin-bottom: 20px;
-        }
-
         .auth-header h1 {
             font-size: 1.8em;
             color: #0f172a;
@@ -200,35 +188,10 @@
             letter-spacing: 0.5px;
         }
 
-        .card-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3em;
-        }
-
         .card .amount {
             font-size: 2em;
             font-weight: 700;
             color: #0f172a;
-        }
-
-        .card.income .card-icon {
-            background: #dcfce7;
-            color: #16a34a;
-        }
-
-        .card.expense .card-icon {
-            background: #fee2e2;
-            color: #dc2626;
-        }
-
-        .card.balance .card-icon {
-            background: #dbeafe;
-            color: #2563eb;
         }
 
         .card.income .amount {
@@ -448,11 +411,6 @@
             color: #94a3b8;
         }
 
-        .empty-state-icon {
-            font-size: 3em;
-            margin-bottom: 15px;
-        }
-
         .category-badge {
             display: inline-block;
             padding: 5px 12px;
@@ -570,7 +528,6 @@
     <!-- Login Form -->
     <div id="loginForm" class="auth-container hidden">
         <div class="auth-header">
-            <div class="auth-logo">📊</div>
             <h1>Financial Management</h1>
             <p>Sign in to access your account</p>
         </div>
@@ -594,7 +551,6 @@
     <!-- Register Form -->
     <div id="registerForm" class="auth-container hidden">
         <div class="auth-header">
-            <div class="auth-logo">📊</div>
             <h1>Create Account</h1>
             <p>Register to start managing your finances</p>
         </div>
@@ -622,7 +578,6 @@
     <!-- Sidebar -->
     <div id="sidebar" class="sidebar hidden">
         <div class="logo">
-            <span class="logo-icon">📊</span>
             FinanceTracker
         </div>
         <div class="user-profile">
@@ -654,21 +609,18 @@
             <div class="card balance">
                 <div class="card-header">
                     <h3>Current Balance</h3>
-                    <div class="card-icon">💰</div>
                 </div>
                 <div class="amount" id="totalBalance">₱0.00</div>
             </div>
             <div class="card income">
                 <div class="card-header">
                     <h3>Total Income</h3>
-                    <div class="card-icon">📈</div>
                 </div>
                 <div class="amount" id="totalIncome">₱0.00</div>
             </div>
             <div class="card expense">
                 <div class="card-header">
                     <h3>Total Expenses</h3>
-                    <div class="card-icon">📉</div>
                 </div>
                 <div class="amount" id="totalExpense">₱0.00</div>
             </div>
@@ -745,7 +697,6 @@
                 </div>
                 <div class="transaction-list" id="transactionList">
                     <div class="empty-state">
-                        <div class="empty-state-icon">📋</div>
                         <p>No transactions recorded yet</p>
                     </div>
                 </div>
@@ -803,7 +754,20 @@
             }
 
             try {
-                const userCheck = await window.storage.get(`user_${username}`);
+                // Check if storage is available
+                if (!window.storage) {
+                    errorDiv.innerHTML = '<div class="error-message">Storage not available. Please ensure you are viewing this in the Claude interface.</div>';
+                    return;
+                }
+
+                let userCheck;
+                try {
+                    userCheck = await window.storage.get(`user_${username}`);
+                } catch (e) {
+                    // User doesn't exist, which is fine for registration
+                    userCheck = null;
+                }
+
                 if (userCheck) {
                     errorDiv.innerHTML = '<div class="error-message">Username already exists</div>';
                     return;
@@ -815,8 +779,13 @@
                     createdAt: new Date().toISOString()
                 };
 
-                await window.storage.set(`user_${username}`, JSON.stringify(userData));
-                await window.storage.set(`transactions_${username}`, JSON.stringify([]));
+                const setResult1 = await window.storage.set(`user_${username}`, JSON.stringify(userData));
+                const setResult2 = await window.storage.set(`transactions_${username}`, JSON.stringify([]));
+
+                if (!setResult1 || !setResult2) {
+                    errorDiv.innerHTML = '<div class="error-message">Failed to save user data. Please try again.</div>';
+                    return;
+                }
 
                 errorDiv.innerHTML = '<div class="success-message">Account created successfully! Please sign in.</div>';
                 
@@ -825,7 +794,8 @@
                     showLogin();
                 }, 1500);
             } catch (error) {
-                errorDiv.innerHTML = '<div class="error-message">Registration failed. Please try again.</div>';
+                console.error('Registration error:', error);
+                errorDiv.innerHTML = '<div class="error-message">Registration failed: ' + error.message + '</div>';
             }
         }
 
@@ -839,9 +809,21 @@
             errorDiv.innerHTML = '';
 
             try {
-                const result = await window.storage.get(`user_${username}`);
+                // Check if storage is available
+                if (!window.storage) {
+                    errorDiv.innerHTML = '<div class="error-message">Storage not available. Please ensure you are viewing this in the Claude interface.</div>';
+                    return;
+                }
+
+                let result;
+                try {
+                    result = await window.storage.get(`user_${username}`);
+                } catch (e) {
+                    errorDiv.innerHTML = '<div class="error-message">Invalid username or password</div>';
+                    return;
+                }
                 
-                if (!result) {
+                if (!result || !result.value) {
                     errorDiv.innerHTML = '<div class="error-message">Invalid username or password</div>';
                     return;
                 }
@@ -860,7 +842,8 @@
                 document.getElementById('loginForm').reset();
                 showMainApp();
             } catch (error) {
-                errorDiv.innerHTML = '<div class="error-message">Login failed. Please try again.</div>';
+                console.error('Login error:', error);
+                errorDiv.innerHTML = '<div class="error-message">Login failed: ' + error.message + '</div>';
             }
         }
 
@@ -1035,7 +1018,7 @@
             const listContainer = document.getElementById('transactionList');
             
             if (filteredTransactions.length === 0) {
-                listContainer.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📋</div><p>No transactions found</p></div>';
+                listContainer.innerHTML = '<div class="empty-state"><p>No transactions found</p></div>';
                 return;
             }
 
@@ -1054,8 +1037,8 @@
                         ${t.type === 'income' ? '+' : '-'}${formatCurrency(t.amount)}
                     </div>
                     <div class="transaction-actions">
-                        <button class="btn-icon" onclick="editTransaction(${t.id})" title="Edit">✏️</button>
-                        <button class="btn-icon delete" onclick="deleteTransaction(${t.id})" title="Delete">🗑️</button>
+                        <button class="btn-icon" onclick="editTransaction(${t.id})" title="Edit">Edit</button>
+                        <button class="btn-icon delete" onclick="deleteTransaction(${t.id})" title="Delete">Delete</button>
                     </div>
                 </div>
             `).join('');
