@@ -150,9 +150,75 @@
             color: white;
         }
 
+        .transactions-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .transactions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .transactions-header h2 {
+            color: #333;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-group select {
+            padding: 8px 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .transaction-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #e5e7eb;
+            transition: background-color 0.2s;
+        }
+
+        .transaction-item:hover {
+            background-color: #f9fafb;
+        }
+
+        .transaction-info {
+            flex: 1;
+        }
+
+        .transaction-description {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .transaction-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85em;
+            color: #666;
+        }
+
         .transaction-amount {
             font-size: 1.2em;
             font-weight: bold;
+            margin-right: 15px;
         }
 
         .transaction-amount.income {
@@ -173,6 +239,7 @@
             border: none;
             cursor: pointer;
             padding: 5px;
+            font-size: 1.2em;
             color: #6b7280;
             transition: color 0.2s;
         }
@@ -204,6 +271,12 @@
         @media (max-width: 640px) {
             .summary-cards {
                 grid-template-columns: 1fr;
+            }
+
+            .transactions-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
             }
         }
     </style>
@@ -312,7 +385,6 @@
         let transactions = [];
         let editingId = null;
 
-        // Load transactions from memory on page load
         window.addEventListener('load', () => {
             loadTransactions();
             setDefaultDate();
@@ -342,7 +414,6 @@
             const date = document.getElementById('date').value;
 
             if (editingId !== null) {
-                // Update existing transaction
                 const index = transactions.findIndex(t => t.id === editingId);
                 transactions[index] = {
                     ...transactions[index],
@@ -355,7 +426,6 @@
                 editingId = null;
                 document.querySelector('.btn-primary').textContent = 'Add Transaction';
             } else {
-                // Add new transaction
                 const transaction = {
                     id: Date.now(),
                     description,
@@ -417,7 +487,6 @@
                 filteredTransactions = filteredTransactions.filter(t => t.category === filterCategory);
             }
 
-            // Calculate totals
             const income = transactions
                 .filter(t => t.type === 'income')
                 .reduce((sum, t) => sum + t.amount, 0);
@@ -428,12 +497,10 @@
             
             const balance = income - expense;
 
-            // Update summary cards
             document.getElementById('totalBalance').textContent = formatCurrency(balance);
             document.getElementById('totalIncome').textContent = formatCurrency(income);
             document.getElementById('totalExpense').textContent = formatCurrency(expense);
 
-            // Update transaction list
             const listContainer = document.getElementById('transactionList');
             
             if (filteredTransactions.length === 0) {
@@ -441,7 +508,6 @@
                 return;
             }
 
-            // Sort by date (newest first)
             filteredTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
 
             listContainer.innerHTML = filteredTransactions.map(t => `
@@ -465,7 +531,7 @@
         }
 
         function formatCurrency(amount) {
-            return '₱' + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '        .transaction,');
+            return '₱' + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
         }
 
         function formatDate(dateString) {
@@ -474,65 +540,4 @@
         }
     </script>
 </body>
-</html>s-section {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .transactions-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .filter-group {
-            display: flex;
-            gap: 10px;
-        }
-
-        .filter-group select {
-            padding: 8px 15px;
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .transaction-list {
-            max-height: 500px;
-            overflow-y: auto;
-        }
-
-        .transaction-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            border-bottom: 1px solid #e5e7eb;
-            transition: background-color 0.2s;
-        }
-
-        .transaction-item:hover {
-            background-color: #f9fafb;
-        }
-
-        .transaction-info {
-            flex: 1;
-        }
-
-        .transaction-description {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .transaction-meta {
-            display: flex;
-            gap: 15px;
-            font-size: 0.85em;
-            color: #666;
-        }
-
-        .transaction
+</html>
